@@ -20,7 +20,8 @@ data class Project(
         require(!company.isNullOrBlank() || !client.isNullOrBlank()) { "Client or company need to be set" }
     }
 
-    fun calculateDuration(): Duration {
+    fun calculateDuration(): Duration? {
+        if (this.tasks.isEmpty()) return null
         return this.tasks.map { it.duration }.reduce { acc, duration -> acc.plus(duration) }
     }
 }

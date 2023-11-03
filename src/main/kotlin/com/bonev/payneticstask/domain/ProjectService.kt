@@ -9,6 +9,8 @@ interface ProjectService {
     fun createProject(request: CreateProjectRequest): Project
     fun getProjectById(projectId: UUID): Optional<Project>
 
+    fun getProjectsByPage(page: Int, pageSize: Int): List<Project>
+
     fun updateProject(request: UpdateProjectRequest): Project
 
     fun updateProjectStatus(request: UpdateProjectStatusRequest): Project
@@ -67,4 +69,3 @@ class ProjectStatusChangeException(message: String) : RuntimeException(message)
 
 class TaskNotFoundException(message: String): RuntimeException(message)
 class TaskStatusChangeException(message: String): RuntimeException(message)
-class TaskValidationException(message: String): RuntimeException(message)

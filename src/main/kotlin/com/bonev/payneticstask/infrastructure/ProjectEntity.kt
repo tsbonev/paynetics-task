@@ -11,7 +11,6 @@ import java.util.*
 @Entity
 data class ProjectEntity(
         @Id
-        @GeneratedValue
         val id: UUID = UUID.randomUUID(),
 
         val title: String,
@@ -30,7 +29,6 @@ data class ProjectEntity(
 @Entity
 data class TaskEntity(
         @Id
-        @GeneratedValue
         val id: UUID = UUID.randomUUID(),
 
         val title: String,
@@ -42,7 +40,7 @@ data class TaskEntity(
 )
 
 fun Project.toEntity(): ProjectEntity {
-        return ProjectEntity(UUID.randomUUID(), this.title,
+        return ProjectEntity(this.id, this.title,
                 this.description, this.status, this.company, this.client, this.tasks.map { it.toEntity() })
 }
 
@@ -52,7 +50,7 @@ fun ProjectEntity.toDomain(): Project {
 }
 
 fun Task.toEntity(): TaskEntity {
-        return TaskEntity(UUID.randomUUID(), this.title, this.description, this.status, this.duration)
+        return TaskEntity(this.id, this.title, this.description, this.status, this.duration)
 }
 
 fun TaskEntity.toDomain(): Task {

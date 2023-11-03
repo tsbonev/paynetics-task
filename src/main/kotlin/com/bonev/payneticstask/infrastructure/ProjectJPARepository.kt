@@ -2,9 +2,14 @@ package com.bonev.payneticstask.infrastructure
 
 import com.bonev.payneticstask.domain.Project
 import com.bonev.payneticstask.domain.ProjectRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 import java.util.*
+
 
 @Repository
 class ProjectJPARepository(private val repo: ProjectCRUDRepository) : ProjectRepository {
@@ -20,6 +25,12 @@ class ProjectJPARepository(private val repo: ProjectCRUDRepository) : ProjectRep
 
         return possibleProject.map { it.toDomain() }
     }
+
+    override fun getPage(page: Int, pageSize: Int): List<Project> {
+        val pageable: Pageable = PageRequest.of(page, pageSize)
+        val items: Page<ProjectEntity> = repo.findAll(pageable)
+        return items.get().toList().map { it.toDomain() }
+    }
 }
 
-interface ProjectCRUDRepository : CrudRepository<ProjectEntity, UUID>
+interface ProjectCRUDRepository : CrudRepository<ProjectEntity, UUID>,  PagingAndSortingRepository<ProjectEntity, UUID>

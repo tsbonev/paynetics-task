@@ -166,6 +166,45 @@ class ProjectServiceImplTest {
     }
 
     @Test
+    fun givenProjectWithTasks_whenUpdateStatusValid_thenWillSaveProject() {
+        val uuid = UUID.randomUUID()
+
+        val taskDone = Task(uuid, "::title::", "::desc::", TaskStatus.DONE, Duration.ofDays(1L))
+        val taskDeleted = Task(uuid, "::title::", "::desc::", TaskStatus.DELETED, Duration.ofDays(1L))
+        val foundProject = Project(uuid, "::title::", "::description::", ProjectStatus.NEW, "::company::", "::client::", listOf(taskDeleted, taskDone))
+        val updatedProject = Project(uuid, "::title::", "::description::", ProjectStatus.DONE, "::company::", "::client::", listOf(taskDeleted, taskDone))
+
+        `when`(projectRepository.get(uuid)).thenReturn(Optional.of(foundProject))
+
+        `when`(projectRepository.save(updatedProject))
+                .thenReturn(updatedProject)
+
+        projectService.updateProjectStatus(UpdateProjectStatusRequest(uuid, ProjectStatus.DONE))
+
+        verify(projectRepository).get(uuid)
+        verify(projectRepository).save(updatedProject)
+        verifyNoMoreInteractions(taskRepository, projectRepository, idGenerator)
+    }
+
+    @Test
+    fun givenProjectWithTasks_whenUpdateStatusInvalid_thenWillThrowException() {
+        val uuid = UUID.randomUUID()
+
+        val taskNew = Task(uuid, "::title::", "::desc::", TaskStatus.NEW, Duration.ofDays(1L))
+        val taskPending = Task(uuid, "::title::", "::desc::", TaskStatus.PENDING, Duration.ofDays(1L))
+        val foundProject = Project(uuid, "::title::", "::description::", ProjectStatus.NEW, "::company::", "::client::", listOf(taskPending, taskNew))
+
+        `when`(projectRepository.get(uuid)).thenReturn(Optional.of(foundProject))
+
+        assertThrows<ProjectStatusChangeException> {
+            projectService.updateProjectStatus(UpdateProjectStatusRequest(uuid, ProjectStatus.DONE))
+        }
+
+        verify(projectRepository).get(uuid)
+        verifyNoMoreInteractions(taskRepository, projectRepository, idGenerator)
+    }
+
+    @Test
     fun givenNoProject_whenUpdateStatus_thenWillThrowException() {
         val uuid = UUID.randomUUID()
 
@@ -209,6 +248,7 @@ class ProjectServiceImplTest {
 
         verify(idGenerator).generateUUID()
         verify(projectRepository).get(uuid)
+        verify(taskRepository).save(task)
         verify(projectRepository).save(updatedProject)
         verifyNoMoreInteractions(taskRepository, projectRepository, idGenerator)
     }
@@ -312,6 +352,24 @@ class ProjectServiceImplTest {
         Assertions.assertEquals(result.get(), foundProject)
 
         verify(projectRepository).get(uuid)
+        verifyNoMoreInteractions(taskRepository, projectRepository, idGenerator)
+    }
+
+    @Test
+    fun givenProject_whenGetPage_thenReturn() {
+        val uuid = UUID.randomUUID()
+
+        val newTask = Task(uuid, "::title::", "::desc::", TaskStatus.NEW, Duration.ofDays(1L))
+        val pendingTask = Task(uuid, "::title::", "::desc::", TaskStatus.PENDING, Duration.ofDays(1L))
+        val foundProject = Project(uuid, "::title::", "::description::", ProjectStatus.NEW, "::company::", "::client::", listOf(newTask, pendingTask))
+
+        `when`(projectRepository.getPage(1, 1)).thenReturn(listOf(foundProject))
+
+        val result = projectService.getProjectsByPage(1, 1)
+
+        Assertions.assertEquals(result, listOf(foundProject))
+
+        verify(projectRepository).getPage(1, 1)
         verifyNoMoreInteractions(taskRepository, projectRepository, idGenerator)
     }
 

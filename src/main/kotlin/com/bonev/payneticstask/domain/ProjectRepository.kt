@@ -6,4 +6,6 @@ interface ProjectRepository {
     fun save(project: Project): Project
 
     fun get(id: UUID): Optional<Project>
+
+    fun getPage(page: Int, pageSize: Int): List<Project>
 }

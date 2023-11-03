@@ -18,6 +18,10 @@ class ProjectServiceImpl(
         return projectRepository.save(project)
     }
 
+    override fun getProjectsByPage(page: Int, pageSize: Int): List<Project> {
+        return projectRepository.getPage(page, pageSize)
+    }
+
     override fun getProjectById(projectId: UUID): Optional<Project> {
         return projectRepository.get(projectId)
     }
@@ -34,6 +38,10 @@ class ProjectServiceImpl(
         if (request.newStatus == ProjectStatus.DELETED) throw ProjectStatusChangeException("Cannot update project status to DELETED")
 
         val project = projectRepository.get(request.projectId).getOrElse { throw ProjectNotFoundException("Project with id ${request.projectId} not found") }
+
+        if (request.newStatus == ProjectStatus.DONE && !project.tasks.all { it.status == TaskStatus.DELETED || it.status == TaskStatus.DONE }) {
+            throw ProjectStatusChangeException("Cannot mark project as DONE when tasks are new or pending")
+        }
 
         val updatedProject = project.copy(status = request.newStatus)
 
@@ -54,6 +62,8 @@ class ProjectServiceImpl(
         val project = projectRepository.get(projectId).getOrElse { throw ProjectNotFoundException("Project with id $projectId not found") }
 
         val task = Task(idGenerator.generateUUID(), taskRequest.title, taskRequest.description, TaskStatus.NEW, taskRequest.duration)
+
+        taskRepository.save(task)
 
         val updateProject = project.copy(tasks = project.tasks.plus(task))
 
