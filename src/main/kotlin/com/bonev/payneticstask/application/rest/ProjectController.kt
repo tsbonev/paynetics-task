@@ -1,4 +1,4 @@
-package com.bonev.payneticstask.application
+package com.bonev.payneticstask.application.rest
 
 import com.bonev.payneticstask.domain.*
 import org.springframework.http.ResponseEntity

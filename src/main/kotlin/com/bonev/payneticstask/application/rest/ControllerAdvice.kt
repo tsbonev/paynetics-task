@@ -1,4 +1,4 @@
-package com.bonev.payneticstask.application
+package com.bonev.payneticstask.application.rest
 
 import com.bonev.payneticstask.domain.ProjectNotFoundException
 import com.bonev.payneticstask.domain.ProjectStatusChangeException

@@ -1,4 +1,4 @@
-package com.bonev.payneticstask.infrastructure
+package com.bonev.payneticstask.infrastructure.jpa
 
 import com.bonev.payneticstask.domain.Project
 import com.bonev.payneticstask.domain.ProjectRepository

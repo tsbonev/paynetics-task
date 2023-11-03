@@ -27,7 +27,7 @@ data class Project(
 }
 
 enum class ProjectStatus {
-    NEW, PENDING, DONE, DELETED
+    NEW, PENDING, DONE, FAILED, DELETED
 }
 
 data class Task(
